@@ -1,0 +1,48 @@
+version: '3'
+services:
+  nestjs-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: titleify-app
+    container_name: titleify-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - KAFKA_BROKER=${KAFKA_BROKER}
+      - MONGODB_URL=${MONGODB_URL}
+    depends_on:
+      - kafka
+      - mongodb
+
+  zookeeper:
+    image: wurstmeister/zookeeper:3.4.6
+    expose:
+    - "2181"
+  kafka:
+    image: wurstmeister/kafka:2.11-2.0.0
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_ADVERTISED_HOST_NAME=kafka
+      - KAFKA_ADVERTISED_PORT=9092
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+
+    depends_on:
+      - zookeeper
+
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
