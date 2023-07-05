@@ -40,23 +40,6 @@ describe('TitleRequestModel', () => {
     });
   });
 
-//   describe('create', () => {
-//     it('should call save method with the provided titleRequest', async () => {
-//       const titleRequest: TitleRequest = {
-//         text: 'sample text',
-//         title: 'sample title',
-//         requestId: 'sampleRequestId',
-//         status: TitleRequestStatus.QUEUED,
-//       }
-
-//       const saveSpy = jest.spyOn(titleRequestDocument, 'save')
-
-//       await titleRequestModel.create(titleRequest);
-
-//       expect(saveSpy).toHaveBeenCalledWith();
-//     });
-//   });
-
   describe('findByRequestId', () => {
     it('should call findOne method with the correct query', async () => {
       const requestId = 'sampleRequestId';
