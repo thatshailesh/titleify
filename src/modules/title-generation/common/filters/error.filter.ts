@@ -2,6 +2,7 @@ import { ClsService } from 'nestjs-cls';
 import { Request, Response } from 'express';
 import { ExceptionFilter, Catch, HttpException, ArgumentsHost, Injectable } from "@nestjs/common";
 import { KafkaService } from '../../../shared/kafka.service';
+import { RpcException } from '@nestjs/microservices';
 
 @Catch()
 export class ErrorFilter implements ExceptionFilter {
@@ -9,7 +10,7 @@ export class ErrorFilter implements ExceptionFilter {
         private readonly cls: ClsService,
         private readonly kafkaService: KafkaService
     ) {}
-    async catch(exception: HttpException, host: ArgumentsHost) {
+    async catch(exception: HttpException | RpcException, host: ArgumentsHost) {
         const requestId = this.cls.getId()
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
@@ -18,16 +19,6 @@ export class ErrorFilter implements ExceptionFilter {
 
         if (!(exception instanceof HttpException)) {
           await this.kafkaService.publishMessage('error', JSON.stringify({exception, requestId}))
-          const status = 500
-          message = 'Internal Server Error';
-          response
-          .status(status)
-          .json({
-              statusCode: status,
-              message,
-              timestamp: new Date().toISOString(),
-              path: request.url,
-          });
         }else {
           const status = exception.getStatus();
           message = exception.message || 'Internal Server Error'
@@ -40,6 +31,5 @@ export class ErrorFilter implements ExceptionFilter {
             path: request.url,
           });
         }
-        
     }
 }

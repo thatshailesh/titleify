@@ -4,7 +4,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import { GetTitleDto } from './dto/get-title.dto';
 import { GetTitleResponseDto } from './dto/get-title.response.dto';
-
+@SkipThrottle()
 @Controller('title-generation')
 export class TiteGenerationController {
     private readonly logger = new Logger('TitleGenerationController');
@@ -15,7 +15,7 @@ export class TiteGenerationController {
     async getTitle(
         @Body() data: GetTitleDto
     ): Promise<GetTitleResponseDto> {
-        this.logger.log(`Received getTitle request: ${JSON.stringify(data)}`);
+        this.logger.log('Received getTitle request');
         const response = await this.titleGenerationService.getTitle(data)
         this.logger.log(`Response sent for getTitle request: ${JSON.stringify(response)}`);
         return response;

@@ -26,7 +26,7 @@ async function bootstrap() {
           groupId: 'title-service-consumer',
         },
       },
-    }
+    }, { inheritAppConfig: true }
   );
   await app.startAllMicroservices();
   await app.listen(3000);
